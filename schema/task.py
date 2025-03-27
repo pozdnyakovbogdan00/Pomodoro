@@ -9,3 +9,7 @@ class Task(BaseModel):
     class Config:
         from_attributes = True
 
+class TaskCreateShema(BaseModel):
+    name: str
+    pomodoro_count: int
+    category_id: int

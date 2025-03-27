@@ -15,7 +15,7 @@ install:  ## Install a dependency using poetry
 	poetry add $(LIBRARY)
 
 migrate-create:
-	alembic revision --autogenerate -m $(MIGRATON)
+	alembic revision --autogenerate -m $(MIGRATION)
 
 migrate-apply:
 	alembic upgrade head
