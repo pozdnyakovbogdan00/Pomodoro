@@ -4,14 +4,22 @@ from sqlalchemy.orm import Session
 from models.user import UserProfile
 from sqlalchemy import insert, select
 
+from schema import UserCreateShema
+
+
 class UserRepository:
     def __init__(self, db_session: Session):
         self.db_session = db_session
 
-    def create_user(self, username: str, password: str) -> UserProfile | None:
+    def get_google_user_by_email(self, email: str) -> UserProfile:
+        query = select(UserProfile).where(UserProfile.email == email)
+        with (self.db_session() as session):
+            return session.execute(query).scalar_one_or_none()
+
+    def create_user(self, user: UserCreateShema) -> UserProfile | None:
         query = insert(UserProfile).values(
-            username=username,
-            password=password).returning(UserProfile.id)
+            **user.model_dump()
+            ).returning(UserProfile.id)
         with (self.db_session() as session):
             user_id: str = session.execute(query).scalar()
             session.commit()
