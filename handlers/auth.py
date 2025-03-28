@@ -1,5 +1,6 @@
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import RedirectResponse
 from typing import Annotated
 
 from exception import UserNotFoundException, UserNotCorrectPasswordException
@@ -17,5 +18,25 @@ async def login(body: UserCreateShema, auth_service: Annotated[AuthService, Depe
         raise HTTPException(status_code=404, detail=e.detail)
     except UserNotCorrectPasswordException as e:
         raise HTTPException(status_code=401, detail=e.detail)
+
+@router.get(
+    "/login/google"
+)
+async def login_google(
+        auth_service: Annotated[AuthService, Depends(get_auth_service)]
+):
+    redirect_url = auth_service.get_google_redirect_url()
+    print(redirect_url)
+    return RedirectResponse(redirect_url)
+
+@router.get(
+    "/google"
+)
+async def google_auth(
+        auth_service: Annotated[AuthService, Depends(get_auth_service)],
+        code: str
+):
+    return auth_service.google_auth(code=code)
+
 
 
