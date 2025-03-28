@@ -2,6 +2,7 @@ from fastapi.params import Security
 from fastapi.security import OAuth2PasswordBearer
 from cache import get_redis_connection
 from client import GoogleClient
+from client.yadnex import YandexeClient
 from database.accessor import get_db_session
 from exception import TokenExpired, TokenNotCorrect
 from repository import TaskRepository, CacheTask, UserRepository
@@ -31,11 +32,15 @@ def get_user_repository(db_session: Session = Depends(get_db_session)) -> UserRe
 def get_google_client() -> GoogleClient:
     return GoogleClient(settings=Settings())
 
+def get_yandex_client() -> YandexeClient:
+    return YandexeClient(settings=Settings())
+
 def get_auth_service(
     user_repository: UserRepository = Depends(get_user_repository),
-    google_client: GoogleClient = Depends(get_google_client)
+    google_client: GoogleClient = Depends(get_google_client),
+    yandex_client: YandexeClient = Depends(get_yandex_client)
 ) -> AuthService:
-    return AuthService(user_repository=user_repository, settings=Settings(), google_client=google_client)
+    return AuthService(user_repository=user_repository, settings=Settings(), google_client=google_client, yandex_client=yandex_client)
 
 def get_user_service(
         user_repository: UserRepository = Depends(get_user_repository),
