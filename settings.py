@@ -17,9 +17,10 @@ class Settings(BaseSettings):
     GOOGLE_SECRET_KEY: str = secret_pwd.GOOGLE_SECRET_KEY
     GOOGLE_REDIRECT_URI: str = secret_pwd.GOOGLE_REDIRECT_URI
     GOOGLE_TOKEN_URL: str = secret_pwd.GOOGLE_TOKEN_URL
-
-
-
+    YANDEX_CLIENT_ID: str = secret_pwd.YANDEX_CLIENT_ID
+    YANDEX_CLIENT_SECRET: str = secret_pwd.YANDEX_CLIENT_SECRET
+    YANDEX_REDIRECT_URI: str = secret_pwd.YANDEX_REDIRECT_URI
+    YANDEX_TOKEN_URL: str = secret_pwd.YANDEX_TOKEN_URL
 
     @property
     def db_url(self) -> str:
@@ -28,3 +29,7 @@ class Settings(BaseSettings):
     @property
     def google_redirect_url(self) -> str:
         return f"https://accounts.google.com/o/oauth2/auth?response_type=code&client_id={self.GOOGLE_CLIENT_ID}&redirect_uri={self.GOOGLE_REDIRECT_URI}&scope=openid%20profile%20email&access_type=offline"
+
+    @property
+    def yandex_redirect_url(self) -> str:
+        return f"https://oauth.yandex.ru/authorize?response_type=code&client_id={self.YANDEX_CLIENT_ID}&redirect_uri={self.YANDEX_REDIRECT_URI}"

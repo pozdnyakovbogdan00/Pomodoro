@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from os.path import exists
 
 from client import GoogleClient
+from client.yadnex import YandexeClient
 from exception import UserNotFoundException, UserNotCorrectPasswordException, TokenExpired, TokenNotCorrect
 from repository import UserRepository
 from schema import UserLoginShema, UserCreateShema
@@ -15,6 +16,13 @@ class AuthService:
     user_repository: UserRepository
     settings: Settings
     google_client: GoogleClient
+    yandex_client: YandexeClient
+
+    def get_yandex_redirect_url(self) -> str:
+        return self.settings.yandex_redirect_url
+
+    def get_yandex_auth(self, code: str):
+        pass
 
     def google_auth(self, code: str):
         user_data = self.google_client.get_user_info(code)
@@ -32,6 +40,25 @@ class AuthService:
         access_token = self.generate_access_token(user_id=created_user.id)
         print("user_create")
         return UserLoginShema(user_id=created_user.id, access_token=access_token)
+
+    def yandex_auth(self, code: str):
+        user_data = self.yandex_client.get_user_info(code)
+
+        if user := self.user_repository.get_google_user_by_email(email = user_data.default_email):
+            access_token = self.generate_access_token(user_id=user.id)
+            print("user_login")
+            return UserLoginShema(user_id=user.id, access_token=access_token)
+
+        create_user_data = UserCreateShema(
+            yandex_access_token=user_data.access_token,
+            email=user_data.default_email,
+            name=user_data.name,
+        )
+        created_user = self.user_repository.create_user(create_user_data)
+        access_token = self.generate_access_token(user_id=created_user.id)
+        print("user_create")
+        return UserLoginShema(user_id=created_user.id, access_token=access_token)
+
 
 
     def get_google_redirect_url(self) -> str:
